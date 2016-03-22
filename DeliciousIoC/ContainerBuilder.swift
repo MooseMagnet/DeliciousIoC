@@ -8,25 +8,25 @@
 
 public protocol IContainerBuilderRegistration {
     
-    var templateFactory: (Container -> Any)! { get }
-    var lifetimeScope: ILifetimeScope! { get }
+    var templateFactory: (IScope -> Any?)! { get }
+    var lifetime: ILifetime! { get }
     var interface: Any.Type! { get }
     var implementation: Any.Type! { get }
     
-    func implements<T>(interface: T.Type) -> Self
-    func hasLifetimeScope(lifetimeScope: ILifetimeScope)
+    func implements<I>(interface: I.Type) -> Self
+    func hasLifetime(lifetime: ILifetime)
 }
 
 public class ContainerBuilderRegistration<T> : IContainerBuilderRegistration {
     
-    public private(set) var templateFactory: (Container -> Any)!
+    public private(set) var templateFactory: (IScope -> Any?)!
     
     public var implementation: Any.Type! { get { return T.self } }
     public private(set) var interface: Any.Type!
     
-    public private(set) var lifetimeScope: ILifetimeScope!
+    public private(set) var lifetime: ILifetime!
     
-    public init(templateFactory: Container -> T) {
+    public init(templateFactory: IScope -> T?) {
         self.templateFactory = templateFactory
         self.implements(T.self)
     }
@@ -36,8 +36,8 @@ public class ContainerBuilderRegistration<T> : IContainerBuilderRegistration {
         return self
     }
     
-    public func hasLifetimeScope(lifetimeScope: ILifetimeScope) {
-        self.lifetimeScope = lifetimeScope
+    public func hasLifetime(lifetime: ILifetime) {
+        self.lifetime = lifetime
     }
 }
 
@@ -45,34 +45,45 @@ public class ContainerBuilder {
     
     private var registrations: Array<IContainerBuilderRegistration> = []
     
-    public func register<T>(templateFactory: Container -> T) -> IContainerBuilderRegistration {
+    private let defaultLifetimeFactory: Void -> ILifetime
+    
+    public init(defaultLifetimeFactory: Void -> ILifetime) {
+        self.defaultLifetimeFactory = defaultLifetimeFactory
+    }
+    
+    public convenience init() {
+        self.init(defaultLifetimeFactory: { TransientLifetime() })
+    }
+    
+    public func register<T>(templateFactory: IScope -> T) -> IContainerBuilderRegistration {
         let registration = ContainerBuilderRegistration(templateFactory: templateFactory)
         registrations.append(registration)
         return registration
     }
     
     public func register<T>(templateFactory: Void -> T) -> IContainerBuilderRegistration {
-        return register({ (_: Container) in
+        return register({ (_: IScope) in
             return templateFactory()
         })
     }
     
     public func build() -> Container {
-        let container = Container()
+        let registry = Registry()
         registrations
-            .map {
-                return (String($0.interface), $0)
-            }
-            .forEach {
-                var lifetimeScope = $0.1.lifetimeScope
-                if lifetimeScope == nil {
-                    lifetimeScope = TransientLifetimeScope()
+            .forEach { (registration: IContainerBuilderRegistration) in
+                
+                var lifetime = registration.lifetime
+                if (lifetime == nil) {
+                    lifetime = TransientLifetime()
                 }
-                let containerRegistration = ContainerRegistration(
-                    lifetimeScope: lifetimeScope,
-                    templateFactory: $0.1.templateFactory)
-                container.register($0.0, registration: containerRegistration)
-        }
+                
+                registry.register(
+                    registration.interface,
+                    lifetime: lifetime,
+                    implementation: registration.templateFactory)
+            }
+        
+        let container = Container(registry: registry)
         return container
     }
 }
