@@ -17,4 +17,8 @@ public class Container {
     public func resolve<T>(type: T.Type) -> T? {
         return rootScope.resolve(type)
     }
+    
+    public func createScope() -> IScope {
+        return rootScope.createScope()
+    }
 }

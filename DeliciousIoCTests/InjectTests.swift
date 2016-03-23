@@ -19,8 +19,8 @@ class InjectTests: XCTestCase {
             .implements(IFoo.self)
         
         builder
-            .register({ (container: Container) in
-                Bar(baz: container.resolve(IBaz.self))
+            .register({ (scope: IScope) in
+                Bar(baz: scope.resolve(IBaz.self)!)
             })
             .implements(IBar.self)
         

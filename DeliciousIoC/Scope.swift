@@ -13,6 +13,9 @@ public protocol IResolver {
 public protocol IScope : IResolver {
     var parentScope: IScope? { get }
     func createScope() -> IScope
+    
+    func trackInstance(instance: Any)
+    func getTrackedInstance<T>(type: T.Type) -> T?
 }
 
 public class Scope : IScope {
@@ -25,13 +28,6 @@ public class Scope : IScope {
     public init(parentScope: IScope?, registry: IRegistry) {
         self.parentScope = parentScope
         self.registry = registry
-    }
-    
-    deinit {
-        // TODO: when deactivating the scope, we should let
-        // instances know so they can do any clean-up...
-        // or maybe we just let their deinit's do it. I dunno.
-        trackedInstances.removeAll()
     }
     
     public convenience init(registry: IRegistry) {
@@ -55,8 +51,12 @@ public class Scope : IScope {
         return instance
     }
     
-    private func trackInstance(instance: Any) {
+    public func trackInstance(instance: Any) {
         trackedInstances.append(instance)
+    }
+    
+    public func getTrackedInstance<T>(type: T.Type) -> T? {
+        return trackedInstances.filter { $0 is T }.first as? T
     }
     
     public func createScope() -> IScope {
