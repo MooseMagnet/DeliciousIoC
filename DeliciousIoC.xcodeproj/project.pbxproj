@@ -19,6 +19,8 @@
 		1643AED91CA1645E0002E6ED /* Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1643AED81CA1645E0002E6ED /* Scope.swift */; };
 		1643AEDB1CA167680002E6ED /* Inject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1643AEDA1CA167680002E6ED /* Inject.swift */; };
 		1643AEDD1CA1724F0002E6ED /* Registry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1643AEDC1CA1724F0002E6ED /* Registry.swift */; };
+		164A248A1CA6153B00C143BE /* TagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164A24891CA6153B00C143BE /* TagTests.swift */; };
+		164A248C1CA6156F00C143BE /* ContainerBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164A248B1CA6156F00C143BE /* ContainerBuilderTests.swift */; };
 		16609E2E1CA29E3000BF63B7 /* PerScopeLifetime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16609E2D1CA29E3000BF63B7 /* PerScopeLifetime.swift */; };
 		16609E301CA2A1B200BF63B7 /* PerContainerLifetime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16609E2F1CA2A1B200BF63B7 /* PerContainerLifetime.swift */; };
 /* End PBXBuildFile section */
@@ -49,6 +51,8 @@
 		1643AED81CA1645E0002E6ED /* Scope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scope.swift; sourceTree = "<group>"; };
 		1643AEDA1CA167680002E6ED /* Inject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Inject.swift; sourceTree = "<group>"; };
 		1643AEDC1CA1724F0002E6ED /* Registry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Registry.swift; sourceTree = "<group>"; };
+		164A24891CA6153B00C143BE /* TagTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagTests.swift; sourceTree = "<group>"; };
+		164A248B1CA6156F00C143BE /* ContainerBuilderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerBuilderTests.swift; sourceTree = "<group>"; };
 		16609E2D1CA29E3000BF63B7 /* PerScopeLifetime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PerScopeLifetime.swift; sourceTree = "<group>"; };
 		16609E2F1CA2A1B200BF63B7 /* PerContainerLifetime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PerContainerLifetime.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -105,10 +109,10 @@
 		162788F71CA0194700B2B381 /* DeliciousIoCTests */ = {
 			isa = PBXGroup;
 			children = (
-				162789161CA020B200B2B381 /* Resolution */,
+				164A24881CA6152E00C143BE /* Builder */,
 				162789101CA01AC900B2B381 /* TestObjects */,
+				162789161CA020B200B2B381 /* Resolution */,
 				162788FA1CA0194700B2B381 /* Info.plist */,
-				1643AED11CA14C330002E6ED /* ScopeTests.swift */,
 			);
 			path = DeliciousIoCTests;
 			sourceTree = "<group>";
@@ -143,17 +147,11 @@
 		162789161CA020B200B2B381 /* Resolution */ = {
 			isa = PBXGroup;
 			children = (
-				162789191CA0211800B2B381 /* Inject */,
+				162789171CA0210800B2B381 /* InjectTests.swift */,
+				1643AED11CA14C330002E6ED /* ScopeTests.swift */,
+				164A24891CA6153B00C143BE /* TagTests.swift */,
 			);
 			name = Resolution;
-			sourceTree = "<group>";
-		};
-		162789191CA0211800B2B381 /* Inject */ = {
-			isa = PBXGroup;
-			children = (
-				162789171CA0210800B2B381 /* InjectTests.swift */,
-			);
-			name = Inject;
 			sourceTree = "<group>";
 		};
 		1643AED31CA15CC60002E6ED /* Lifetime */ = {
@@ -165,6 +163,14 @@
 				16609E2F1CA2A1B200BF63B7 /* PerContainerLifetime.swift */,
 			);
 			name = Lifetime;
+			sourceTree = "<group>";
+		};
+		164A24881CA6152E00C143BE /* Builder */ = {
+			isa = PBXGroup;
+			children = (
+				164A248B1CA6156F00C143BE /* ContainerBuilderTests.swift */,
+			);
+			name = Builder;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -291,6 +297,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				164A248C1CA6156F00C143BE /* ContainerBuilderTests.swift in Sources */,
+				164A248A1CA6153B00C143BE /* TagTests.swift in Sources */,
 				162789181CA0210800B2B381 /* InjectTests.swift in Sources */,
 				1643AED21CA14C330002E6ED /* ScopeTests.swift in Sources */,
 				162789121CA01AF400B2B381 /* TestObjects.swift in Sources */,
