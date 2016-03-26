@@ -51,8 +51,6 @@ public class Scope : IScope {
             return nil
         }
         
-        trackInstance(instance)
-        
         return instance
     }
     
