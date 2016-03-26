@@ -31,4 +31,29 @@ class TagTests : XCTestCase {
         let resolvedWithTag = container.resolve(IFoo.self, tag: "tag") as! Foo
         XCTAssert(resolvedWithTag === instance)
     }
+    
+    func testMultipleTaggedResolutions() {
+        
+        let builder = ContainerBuilder()
+        
+        builder
+            .register({ Fu() })
+            .implements(IFoo.self)
+            .hasTag("Fu")
+
+        builder
+            .register({ Foo() })
+            .implements(IFoo.self)
+        
+        let container = try! builder.build()
+        
+        guard let _ = container.resolve(IFoo.self, tag: "Fu") as? Fu else {
+            XCTFail()
+            return
+        }
+        guard let _ = container.resolve(IFoo.self) as? Foo else {
+            XCTFail()
+            return
+        }
+    }
 }

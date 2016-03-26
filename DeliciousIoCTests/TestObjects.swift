@@ -40,6 +40,12 @@ class Foo : IFoo{
     }
 }
 
+class Fu : IFoo {
+    func foo() -> Int {
+        return 999
+    }
+}
+
 class Bar : IBar {
     
     let baz: IBaz
