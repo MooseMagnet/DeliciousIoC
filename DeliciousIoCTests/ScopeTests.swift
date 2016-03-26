@@ -80,7 +80,7 @@ class ScopeTests : XCTestCase {
         XCTAssert(resolvedWithTag === instance)
     }
     
-    func testFailToCreateDuplicateTaggedRegistrations() {
+    func testFailToCreateContainerWithDuplicateTaggedRegistrations() {
         let builder = ContainerBuilder()
         
         let register = {
