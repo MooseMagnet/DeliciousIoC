@@ -12,22 +12,29 @@ public protocol IContainerBuilderRegistration {
     var lifetime: ILifetime! { get }
     var interface: Any.Type! { get }
     var implementation: Any.Type! { get }
+    var tag: String? { get }
     
     func implements<I>(interface: I.Type) -> Self
-    func hasLifetime(lifetime: ILifetime)
+    func hasLifetime(lifetime: ILifetime) -> Self
+    func hasTag(tag: String) -> Self
 }
 
 public class ContainerBuilderRegistration<T> : IContainerBuilderRegistration {
+    
+    private var containerBuilder: ContainerBuilder
     
     public private(set) var templateFactory: (IScope -> Any?)!
     
     public var implementation: Any.Type! { get { return T.self } }
     public private(set) var interface: Any.Type!
     
+    public private(set) var tag: String?
+    
     public private(set) var lifetime: ILifetime!
     
-    public init(templateFactory: IScope -> T?) {
+    public init(templateFactory: IScope -> T?, containerBuilder: ContainerBuilder) {
         self.templateFactory = templateFactory
+        self.containerBuilder = containerBuilder
         self.implements(T.self)
     }
     
@@ -36,9 +43,19 @@ public class ContainerBuilderRegistration<T> : IContainerBuilderRegistration {
         return self
     }
     
-    public func hasLifetime(lifetime: ILifetime) {
+    public func hasLifetime(lifetime: ILifetime) -> Self {
         self.lifetime = lifetime
+        return self
     }
+    
+    public func hasTag(tag: String) -> Self {
+        self.tag = tag
+        return self
+    }
+}
+
+public enum ContainerBuilderError : ErrorType {
+    case DuplicateRegistration(type: Any.Type, tag: String?)
 }
 
 public class ContainerBuilder {
@@ -56,7 +73,9 @@ public class ContainerBuilder {
     }
     
     public func register<T>(templateFactory: IScope -> T) -> IContainerBuilderRegistration {
-        let registration = ContainerBuilderRegistration(templateFactory: templateFactory)
+        let registration = ContainerBuilderRegistration(
+            templateFactory: templateFactory,
+            containerBuilder: self)
         registrations.append(registration)
         return registration
     }
@@ -67,7 +86,10 @@ public class ContainerBuilder {
         })
     }
     
-    public func build() -> Container {
+    public func build() throws -> Container {
+        
+        try avoidDuplicates()
+        
         let registry = Registry()
         registrations
             .forEach { (registration: IContainerBuilderRegistration) in
@@ -85,12 +107,28 @@ public class ContainerBuilder {
                         guard let instance = registration.templateFactory(scope) else {
                             return nil
                         }
-                        inject(instance, scope: scope)
+                        inject(instance, scope: scope, tag: registration.tag)
                         return instance
-                    })
+                    },
+                    tag: registration.tag)
             }
         
         let container = Container(registry: registry)
         return container
+    }
+    
+    private func avoidDuplicates() throws {
+        var group: [String:IContainerBuilderRegistration] = [:]
+        
+        try registrations
+            .forEach { (registration) -> () in
+                let key = "\(String(registration.interface)):~\(registration.tag)"
+                guard group[key] == nil else {
+                    throw ContainerBuilderError.DuplicateRegistration(
+                        type: registration.interface,
+                        tag: registration.tag)
+                }
+                group[key] = registration
+            }
     }
 }

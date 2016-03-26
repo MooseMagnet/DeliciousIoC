@@ -31,7 +31,7 @@ class InjectTests: XCTestCase {
         builder
             .register({ Qux() })
         
-        let container = builder.build()
+        let container = try! builder.build()
         
         let foo = container.resolve(IFoo.self) as! Foo
         let bar = foo.bar.value as! Bar

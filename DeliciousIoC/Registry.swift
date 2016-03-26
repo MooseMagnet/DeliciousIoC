@@ -23,17 +23,17 @@ public class Registration : IRegistration {
 }
 
 public protocol IRegistry {
-    func register(interface: Any.Type, lifetime: ILifetime, implementation: IScope -> Any?)
-    func getRegistration(forInterface: Any.Type) -> IRegistration?
+    func register(interface: Any.Type, lifetime: ILifetime, implementation: IScope -> Any?, tag: String?)
+    func getRegistration(forInterface: Any.Type, tag: String?) -> IRegistration?
 }
 
 public class Registry : IRegistry {
     
     private var registrations: [String: IRegistration] = [:]
     
-    public func register(interface: Any.Type, lifetime: ILifetime, implementation: IScope -> Any?) {
+    public func register(interface: Any.Type, lifetime: ILifetime, implementation: IScope -> Any?, tag: String?) {
         
-        guard getRegistration(interface) == nil else {
+        guard getRegistration(interface, tag: tag) == nil else {
             fatalError("You can't re-register a thing, you ding-a-ling.")
         }
         
@@ -42,11 +42,16 @@ public class Registry : IRegistry {
             templateFactory: implementation,
             type: interface)
         
-        registrations[String(interface)] = registration
+        let key = "\(String(interface)):~\(tag)"
+        
+        registrations[key] = registration
     }
     
-    public func getRegistration(interface: Any.Type) -> IRegistration? {
-        return registrations[String(interface)]
+    public func getRegistration(interface: Any.Type, tag: String?) -> IRegistration? {
+        
+        let key = "\(String(interface)):~\(tag)"
+        
+        return registrations[key]
     }
     
 }

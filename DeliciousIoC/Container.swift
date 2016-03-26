@@ -18,6 +18,10 @@ public class Container {
         return rootScope.resolve(type)
     }
     
+    public func resolve<T>(type: T.Type, tag: String?) -> T? {
+        return rootScope.resolve(type, tag: tag)
+    }
+    
     public func createScope() -> IScope {
         return rootScope.createScope()
     }

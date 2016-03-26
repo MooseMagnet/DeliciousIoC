@@ -8,6 +8,7 @@
 
 public protocol IResolver {
     func resolve<T>(type: T.Type) -> T?
+    func resolve<T>(type: T.Type, tag: String?) -> T?
 }
 
 public protocol IScope : IResolver {
@@ -35,7 +36,11 @@ public class Scope : IScope {
     }
     
     public func resolve<T>(type: T.Type) -> T? {
-        guard let registration = registry.getRegistration(type) else {
+        return resolve(type, tag: nil)
+    }
+    
+    public func resolve<T>(type: T.Type, tag: String?) -> T? {
+        guard let registration = registry.getRegistration(type, tag: tag) else {
             return nil
         }
 

@@ -8,7 +8,7 @@
 
 
 public protocol InjectWrapper {
-    func setValue(scope: IScope)
+    func setValue(scope: IScope, tag: String?)
 }
 
 public class Inject<T> : InjectWrapper {
@@ -18,17 +18,17 @@ public class Inject<T> : InjectWrapper {
     // NOTE: Swift compiler is broken
     public init() {}
     
-    public func setValue(scope: IScope) {
-        value = scope.resolve(T)
+    public func setValue(scope: IScope, tag: String?) {
+        value = scope.resolve(T.self, tag: tag)
     }
 }
 
-internal func inject(instance: Any, scope: IScope) {
+internal func inject(instance: Any, scope: IScope, tag: String?) {
     Mirror(reflecting: instance)
         .children
         .map { $0.value as? InjectWrapper }
         .filter { $0 != nil }
         .forEach {
-            $0!.setValue(scope)
+            $0!.setValue(scope, tag: tag)
     }
 }

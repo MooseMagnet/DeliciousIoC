@@ -20,7 +20,7 @@ class ScopeTests : XCTestCase {
             .implements(IFoo.self)
             .hasLifetime(PerScopeLifetime())
         
-        let container = builder.build()
+        let container = try! builder.build()
         
         let scope1 = container.createScope()
         let scope2 = container.createScope()
@@ -46,7 +46,7 @@ class ScopeTests : XCTestCase {
             .implements(IFoo.self)
             .hasLifetime(PerContainerLifetime())
         
-        let container = builder.build()
+        let container = try! builder.build()
         
         let scope1 = container.createScope()
         let scope2 = container.createScope()
@@ -59,4 +59,50 @@ class ScopeTests : XCTestCase {
         XCTAssert(containerInstance === scope2Instance)
     }
     
+    func testTaggedInstances() {
+        
+        let builder = ContainerBuilder()
+        
+        let instance = Foo()
+        
+        builder
+            .register({ instance })
+            .implements(IFoo.self)
+            .hasLifetime(PerContainerLifetime())
+            .hasTag("tag")
+        
+        let container = try! builder.build()
+        
+        let unresolved = container.resolve(IFoo.self)
+        XCTAssert(unresolved == nil)
+        
+        let resolvedWithTag = container.resolve(IFoo.self, tag: "tag") as! Foo
+        XCTAssert(resolvedWithTag === instance)
+    }
+    
+    func testFailToCreateDuplicateTaggedRegistrations() {
+        let builder = ContainerBuilder()
+        
+        let register = {
+            builder
+                .register({ Foo() })
+                .implements(IFoo.self)
+                .hasLifetime(PerContainerLifetime())
+                .hasTag("tag")
+        }
+        register()
+        register()
+        
+        do {
+            _ = try builder.build()
+        } catch ContainerBuilderError.DuplicateRegistration(type: let type, tag: let tag) {
+            XCTAssert(type == IFoo.self)
+            XCTAssert(tag == "tag")
+            return
+        } catch {
+            XCTFail()
+        }
+        
+        XCTFail()
+    }
 }
