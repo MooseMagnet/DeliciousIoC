@@ -40,7 +40,11 @@ class TagTests : XCTestCase {
             .register({ Fu() })
             .implements(IFoo.self)
             .hasTag("Fu")
-
+        
+        builder
+            .register({ Fu() })
+            .hasTag("Fu")
+        
         builder
             .register({ Foo() })
             .implements(IFoo.self)
@@ -52,6 +56,10 @@ class TagTests : XCTestCase {
             return
         }
         guard let _ = container.resolve(IFoo.self) as? Foo else {
+            XCTFail()
+            return
+        }
+        guard let _ = container.resolve(Fu.self, tag: "Fu") else {
             XCTFail()
             return
         }
