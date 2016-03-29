@@ -103,7 +103,6 @@ public class ContainerBuilder {
                     registration.interface,
                     lifetime: lifetime,
                     implementation: { (scope: IScope) in
-                        // TODO: Should this be here? I HATE YOU.
                         guard let instance = registration.templateFactory(scope) else {
                             return nil
                         }
