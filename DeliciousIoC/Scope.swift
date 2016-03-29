@@ -6,19 +6,6 @@
 //  Copyright © 2016 DevSword. All rights reserved.
 //
 
-public protocol IResolver {
-    func resolve<T>(type: T.Type) -> T?
-    func resolve<T>(type: T.Type, tag: String?) -> T?
-}
-
-public protocol IScope : IResolver {
-    var parentScope: IScope? { get }
-    func createScope() -> IScope
-    
-    func trackInstance(instance: Any)
-    func getTrackedInstance<T>(type: T.Type) -> T?
-}
-
 public class Scope : IScope {
     
     public private(set) var parentScope: IScope?
