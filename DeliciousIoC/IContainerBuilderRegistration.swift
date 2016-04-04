@@ -13,8 +13,10 @@ public protocol IContainerBuilderRegistration {
     var interface: Any.Type! { get }
     var implementation: Any.Type! { get }
     var tag: String? { get }
+    var defaultResolution: Bool { get }
     
     func implements<I>(interface: I.Type) -> Self
     func hasLifetime(lifetime: ILifetime) -> Self
     func hasTag(tag: String) -> Self
+    func isDefaultResolution() -> Self
 }

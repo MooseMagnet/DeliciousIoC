@@ -9,4 +9,5 @@
 public protocol IRegistration {
     var lifetime: ILifetime { get }
     var templateFactory: IScope -> Any? { get }
+    var defaultResolution: Bool { get }
 }

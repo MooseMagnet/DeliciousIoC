@@ -15,11 +15,19 @@ public class Container {
     }
     
     public func resolve<T>(type: T.Type) -> T? {
-        return rootScope.resolve(type)
+        return resolve(type, tag: nil)
     }
     
     public func resolve<T>(type: T.Type, tag: String?) -> T? {
         return rootScope.resolve(type, tag: tag)
+    }
+    
+    public func resolveAll<T>(type: T.Type) -> Array<T> {
+        return resolveAll(type, tag: nil)
+    }
+    
+    public func resolveAll<T>(type: T.Type, tag: String?) -> Array<T> {
+        return rootScope.resolveAll(type, tag: tag)
     }
     
     public func createScope() -> IScope {

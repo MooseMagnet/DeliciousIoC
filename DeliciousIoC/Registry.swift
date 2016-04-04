@@ -8,29 +8,58 @@
 
 public class Registry : IRegistry {
     
-    private var registrations: [String: IRegistration] = [:]
+    private var registrations: [String: ArrayReference<IRegistration>] = [:]
     
-    public func register(interface: Any.Type, lifetime: ILifetime, implementation: IScope -> Any?, tag: String?) {
+    public func register(interface: Any.Type, lifetime: ILifetime, implementation: IScope -> Any?, tag: String?, isDefaultResolution: Bool) {
         
-        guard getRegistration(interface, tag: tag) == nil else {
+        let defaultResolutionRegistration = getRegistrationsIfAny(interface, tag: tag)?
+            .filter {
+                $0.defaultResolution
+            }
+            .first
+        
+        if isDefaultResolution && defaultResolutionRegistration != nil {
             fatalError("You can't re-register a thing, you ding-a-ling.")
         }
         
         let registration = Registration(
             lifetime: lifetime,
             templateFactory: implementation,
-            type: interface)
+            type: interface,
+            isDefaultResolution: isDefaultResolution)
         
         let key = "\(String(interface)):~\(tag)"
         
-        registrations[key] = registration
+        if registrations[key] == nil {
+            registrations[key] = ArrayReference(array: [])
+        }
+        
+        registrations[key]?.append(registration)
     }
     
-    public func getRegistration(interface: Any.Type, tag: String?) -> IRegistration? {
+    public func getDefaultRegistration(interface: Any.Type, tag: String?) -> IRegistration? {
         
-        let key = "\(String(interface)):~\(tag)"
+        guard let registrations = getRegistrationsIfAny(interface, tag: tag) else {
+            return nil
+        }
         
-        return registrations[key]
+        if registrations.count == 1 {
+            return registrations[0]
+        }
+        
+        return registrations
+            .filter {
+                $0.defaultResolution
+            }
+            .first
     }
     
+    public func getRegistrations(interface: Any.Type, tag: String?) -> Array<IRegistration> {
+        return getRegistrationsIfAny(interface, tag: tag) ?? []
+    }
+    
+    private func getRegistrationsIfAny(type: Any.Type, tag: String?) -> Array<IRegistration>? {
+        let key = "\(String(type)):~\(tag)"
+        return registrations[key]?.array
+    }
 }

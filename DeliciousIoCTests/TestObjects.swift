@@ -30,6 +30,24 @@ class Service : IService {
     }
 }
 
+class ServiceWithTaggedDependency : IService {
+    
+    let qux = Inject<Qux>(tag: "tag")
+    
+    func please() -> Bool {
+        return true
+    }
+}
+
+class ServiceWithEnumerableDependencies : IService {
+    
+    let soManyFoos = InjectMany<IFoo>()
+    
+    func please() -> Bool {
+        return true
+    }
+}
+
 class Foo : IFoo{
     
     var bar = Inject<IBar>()

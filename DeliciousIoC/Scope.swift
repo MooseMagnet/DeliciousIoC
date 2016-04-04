@@ -27,7 +27,8 @@ public class Scope : IScope {
     }
     
     public func resolve<T>(type: T.Type, tag: String?) -> T? {
-        guard let registration = registry.getRegistration(type, tag: tag) else {
+        
+        guard let registration = registry.getDefaultRegistration(type, tag: tag) else {
             return nil
         }
 
@@ -39,6 +40,24 @@ public class Scope : IScope {
         }
         
         return instance
+    }
+    
+    public func resolveAll<T>(type: T.Type) -> Array<T> {
+        return resolveAll(type, tag: nil)
+    }
+    
+    public func resolveAll<T>(type: T.Type, tag: String?) -> Array<T> {
+        
+        let registrations = registry.getRegistrations(type, tag: tag)
+        
+        if registrations.count == 0 {
+            return []
+        }
+        
+        return registrations
+            .map {
+                $0.lifetime.get($0.templateFactory, scope: self) as! T
+            }
     }
     
     public func trackInstance(instance: Any) {

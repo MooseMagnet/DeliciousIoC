@@ -8,27 +8,53 @@
 
 
 public protocol InjectWrapper {
-    func setValue(scope: IScope, tag: String?)
+    func setValue(scope: IScope)
 }
 
 public class Inject<T> : InjectWrapper {
     
     public private(set) var value: T!
+    public private(set) var tag: String?
     
     // NOTE: Swift compiler is broken
-    public init() {}
+    public init() {
+        self.tag = nil
+    }
     
-    public func setValue(scope: IScope, tag: String?) {
+    public init(tag: String) {
+        self.tag = tag
+    }
+    
+    public func setValue(scope: IScope) {
         value = scope.resolve(T.self, tag: tag)
     }
 }
 
-internal func inject(instance: Any, scope: IScope, tag: String?) {
+public class InjectMany<T> : InjectWrapper {
+    
+    public private(set) var value: Array<T>!
+    public private(set) var tag: String?
+    
+    // NOTE: Swift compiler is broken
+    public init() {
+        self.tag = nil
+    }
+    
+    public init(tag: String) {
+        self.tag = tag
+    }
+    
+    public func setValue(scope: IScope) {
+        value = scope.resolveAll(T.self, tag: tag)
+    }
+}
+
+internal func inject(instance: Any, scope: IScope) {
     Mirror(reflecting: instance)
         .children
         .map { $0.value as? InjectWrapper }
         .filter { $0 != nil }
         .forEach {
-            $0!.setValue(scope, tag: tag)
+            $0!.setValue(scope)
     }
 }

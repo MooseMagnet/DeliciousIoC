@@ -9,4 +9,6 @@
 public protocol IResolver {
     func resolve<T>(type: T.Type) -> T?
     func resolve<T>(type: T.Type, tag: String?) -> T?
+    func resolveAll<T>(type: T.Type) -> Array<T>
+    func resolveAll<T>(type: T.Type, tag: String?) -> Array<T>
 }

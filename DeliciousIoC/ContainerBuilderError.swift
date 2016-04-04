@@ -7,5 +7,5 @@
 //
 
 public enum ContainerBuilderError : ErrorType {
-    case DuplicateRegistration(type: Any.Type, tag: String?)
+    case InterfaceHasMultipleDefaultResolutions(type: Any.Type, tag: String?)
 }

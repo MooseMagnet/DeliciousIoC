@@ -44,4 +44,55 @@ class InjectTests: XCTestCase {
         XCTAssertNotNil(qux)
     }
     
+    func testTaggedInjectPropertiesAreResolvedCorrectly() {
+        
+        let builder = ContainerBuilder()
+        
+        builder
+            .register({ ServiceWithTaggedDependency() })
+            .implements(IService.self)
+        
+        let qux = Qux()
+        builder
+            .register({ qux })
+            .hasTag("tag")
+        
+        let container = try! builder.build()
+        
+        let service = container.resolve(IService.self) as! ServiceWithTaggedDependency
+        
+        XCTAssertNotNil(service)
+        XCTAssert(service.qux.value === qux)
+    }
+    
+    func testInjectManyPropertiesAreResolvedCorrectly() {
+        
+        let builder = ContainerBuilder()
+        
+        builder
+            .register({ ServiceWithEnumerableDependencies() })
+            .implements(IService.self)
+        
+        let foo = Foo()
+        builder
+            .register({ foo })
+            .implements(IFoo.self)
+        
+        builder
+            .register({ Bar(baz: Baz()) })
+            .implements(IBar.self)
+        
+        let fu = Fu()
+        builder
+            .register({ fu })
+            .implements(IFoo.self)
+        
+        let container = try! builder.build()
+        
+        let service = container.resolve(IService.self) as! ServiceWithEnumerableDependencies
+        
+        XCTAssertNotNil(service)
+        XCTAssert(service.soManyFoos.value[0] as! Foo === foo)
+        XCTAssert(service.soManyFoos.value[1] as! Fu === fu)
+    }
 }

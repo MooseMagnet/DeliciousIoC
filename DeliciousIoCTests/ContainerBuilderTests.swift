@@ -11,7 +11,7 @@ import XCTest
 
 class ContainerBuilderTests : XCTestCase {
     
-    func testFailToCreateContainerWithDuplicateTaggedRegistrations() {
+    func testFailToCreateContainerWithMultipleDefaultResolutions() {
         let builder = ContainerBuilder()
         
         let register = {
@@ -20,13 +20,14 @@ class ContainerBuilderTests : XCTestCase {
                 .implements(IFoo.self)
                 .hasLifetime(PerContainerLifetime())
                 .hasTag("tag")
+                .isDefaultResolution()
         }
         register()
         register()
         
         do {
             _ = try builder.build()
-        } catch ContainerBuilderError.DuplicateRegistration(type: let type, tag: let tag) {
+        } catch ContainerBuilderError.InterfaceHasMultipleDefaultResolutions(type: let type, tag: let tag) {
             XCTAssert(type == IFoo.self)
             XCTAssert(tag == "tag")
             return

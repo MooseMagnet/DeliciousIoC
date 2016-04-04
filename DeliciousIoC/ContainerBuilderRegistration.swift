@@ -19,6 +19,8 @@ public class ContainerBuilderRegistration<T> : IContainerBuilderRegistration {
     
     public private(set) var lifetime: ILifetime!
     
+    public private(set) var defaultResolution = false
+    
     public init(templateFactory: IScope -> T?, containerBuilder: ContainerBuilder) {
         self.templateFactory = templateFactory
         self.containerBuilder = containerBuilder
@@ -37,6 +39,11 @@ public class ContainerBuilderRegistration<T> : IContainerBuilderRegistration {
     
     public func hasTag(tag: String) -> Self {
         self.tag = tag
+        return self
+    }
+    
+    public func isDefaultResolution() -> Self {
+        self.defaultResolution = true
         return self
     }
 }

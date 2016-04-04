@@ -36,7 +36,7 @@ public class ContainerBuilder {
     
     public func build() throws -> Container {
         
-        try avoidDuplicates()
+        try avoidMultipleDefaultResolutions()
         
         let registry = Registry()
         registrations
@@ -54,28 +54,41 @@ public class ContainerBuilder {
                         guard let instance = registration.templateFactory(scope) else {
                             return nil
                         }
-                        inject(instance, scope: scope, tag: registration.tag)
+                        inject(instance, scope: scope)
                         return instance
                     },
-                    tag: registration.tag)
+                    tag: registration.tag,
+                    isDefaultResolution: registration.defaultResolution)
             }
         
         let container = Container(registry: registry)
         return container
     }
     
-    private func avoidDuplicates() throws {
-        var group: [String:IContainerBuilderRegistration] = [:]
+    private func avoidMultipleDefaultResolutions() throws {
         
         try registrations
             .forEach { (registration) -> () in
-                let key = "\(String(registration.interface)):~\(registration.tag)"
-                guard group[key] == nil else {
-                    throw ContainerBuilderError.DuplicateRegistration(
-                        type: registration.interface,
-                        tag: registration.tag)
+                
+                let allInterfaceRegistrations = registrations
+                    .filter {
+                        $0.interface == registration.interface &&
+                        $0.tag == registration.tag
+                    }
+                
+                if allInterfaceRegistrations.count == 1 {
+                    return
                 }
-                group[key] = registration
+                
+                let defaultRegistrations = allInterfaceRegistrations
+                    .filter {
+                        $0.defaultResolution
+                    }
+                
+                if defaultRegistrations.count > 1 {
+                    throw ContainerBuilderError.InterfaceHasMultipleDefaultResolutions(type: registration.interface, tag: registration.tag)
+                }
+                
             }
     }
 }
