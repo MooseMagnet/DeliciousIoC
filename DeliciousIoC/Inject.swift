@@ -16,7 +16,6 @@ public class Inject<T> : InjectWrapper {
     public private(set) var value: T!
     public private(set) var tag: String?
     
-    // NOTE: Swift compiler is broken
     public init() {
         self.tag = nil
     }
@@ -35,7 +34,6 @@ public class InjectMany<T> : InjectWrapper {
     public private(set) var value: Array<T>!
     public private(set) var tag: String?
     
-    // NOTE: Swift compiler is broken
     public init() {
         self.tag = nil
     }
