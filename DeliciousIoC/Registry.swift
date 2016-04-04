@@ -19,7 +19,7 @@ public class Registry : IRegistry {
             .first
         
         if isDefaultResolution && defaultResolutionRegistration != nil {
-            fatalError("You can't re-register a thing, you ding-a-ling.")
+            fatalError("There's already a default resolution.")
         }
         
         let registration = Registration(
